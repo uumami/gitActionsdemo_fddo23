@@ -3,40 +3,36 @@ name: Chequeador Inicial
 on: [push]
 
 jobs:
-    deny-push-and-automerge:
-        runs-on: ubuntu-latest
+  deny-push-and-automerge:
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Check commit author 
-            id: check_actor
-            run: |
-                if [["${{ github.actor }}" == "OMAR"]]; then
-                    echo "::set-output name=deny_push::true"
-                else
-                    echo "::set-output name=deny_push::false"
-                fi
-            
-            - name: Check commit message
-            id: check_commit_message
-            run: |
-                if [["${{github.event.head_commit.message}}" == "123"]];then
-                    echo "::set-output name=deny_push::true"
-                else
-                    echo "::set-output name=deny_push::false"
-                fi
+    steps:
+      - name: Check commit author 
+        id: check_actor
+        run: |
+          if [[ "${GITHUB_ACTOR}" == "OMAR" ]]; then
+              echo "::set-output name=deny_push::true"
+          else
+              echo "::set-output name=deny_push::false"
+          fi
+      
+      - name: Check commit message
+        id: check_commit_message
+        run: |
+          if [[ "${{ github.event.head_commit.message }}" == "123" ]]; then
+              echo "::set-output name=deny_push::true"
+          else
+              echo "::set-output name=deny_push::false"
+          fi
 
-            - name: Deny push
-            if: steps.check_actor.outputs.deny_push == "true" || steps.check_commit_message.outputs.deny_push == "true"
-            run: |
-                echo "You are allowed to push to this repository"
-                exit 1
+      - name: Deny push
+        if: steps.check_actor.outputs.deny_push == 'true' || steps.check_commit_message.outputs.deny_push == 'true'
+        run: |
+          echo "You are not allowed to push to this repository"
+          exit 1
 
-            - name: Deny push
-                if: steps.check_actor.outputs.deny_push == "false" && steps.check_commit_message.outputs.deny_push == "false"
-                run: |
-                    echo "You are allowed to push to this repository"
-                    git merge <branch_name>
-
-
-
-            
+      - name: Automerge
+        if: steps.check_actor.outputs.deny_push == 'false' && steps.check_commit_message.outputs.deny_push == 'false'
+        run: |
+          echo "You are allowed to push to this repository"
+          git merge <branch_name>
