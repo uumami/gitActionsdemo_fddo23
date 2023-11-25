@@ -22,11 +22,11 @@ jobs:
         id: check_commit_message
         run: |
           if [[ "${{ github.event.head_commit.message }}" == "123" ]]; then
-              echo "::set-output name=deny_push::true"
-              echo "Deny push (commit message): true"
-          else
               echo "::set-output name=deny_push::false"
               echo "Deny push (commit message): false"
+          else
+              echo "::set-output name=deny_push::true"
+              echo "Deny push (commit message): true"
           fi
 
       - name: Deny push
