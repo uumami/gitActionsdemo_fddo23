@@ -10,7 +10,7 @@ jobs:
       - name: Check commit author 
         id: check_actor
         run: |
-          if [[ "$GITHUB_ACTOR" == "OMAR" ]]; then
+          if [[ "${GITHUB_ACTOR}" == "OMAR" ]]; then
               echo "::set-output name=deny_push::true"
               echo "Deny push (actor): true"
           else
@@ -20,15 +20,13 @@ jobs:
       
       - name: Check commit message
         id: check_commit_message
-        env:
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         run: |
-          if [[ "$COMMIT_MESSAGE" == "123" ]]; then
-              echo "::set-output name=deny_push::true"
-              echo "Deny push (commit message): true"
-          else
+          if [[ "${{ github.event.head_commit.message }}" == "123" ]]; then
               echo "::set-output name=deny_push::false"
               echo "Deny push (commit message): false"
+          else
+              echo "::set-output name=deny_push::true"
+              echo "Deny push (commit message): true"
           fi
 
       - name: Deny push
