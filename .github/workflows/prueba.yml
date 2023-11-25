@@ -12,8 +12,10 @@ jobs:
         run: |
           if [[ "${GITHUB_ACTOR}" == "OMAR" ]]; then
               echo "::set-output name=deny_push::true"
+              echo "Deny push (actor): true"
           else
               echo "::set-output name=deny_push::false"
+              echo "Deny push (actor): false"
           fi
       
       - name: Check commit message
@@ -21,18 +23,22 @@ jobs:
         run: |
           if [[ "${{ github.event.head_commit.message }}" == "123" ]]; then
               echo "::set-output name=deny_push::true"
+              echo "Deny push (commit message): true"
           else
               echo "::set-output name=deny_push::false"
+              echo "Deny push (commit message): false"
           fi
 
       - name: Deny push
         if: steps.check_actor.outputs.deny_push == 'true' || steps.check_commit_message.outputs.deny_push == 'true'
         run: |
+          echo "Deny push final decision: true"
           echo "You are not allowed to push to this repository"
           exit 1
 
       - name: Automerge
         if: steps.check_actor.outputs.deny_push == 'false' && steps.check_commit_message.outputs.deny_push == 'false'
         run: |
+          echo "Deny push final decision: false"
           echo "You are allowed to push to this repository"
           git merge <branch_name>
